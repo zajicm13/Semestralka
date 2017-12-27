@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import *
 from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import asksaveasfilename
 from tkinter.messagebox import showerror
 from PIL import ImageTk
 from PIL import Image
@@ -23,6 +24,8 @@ class Editor(tk.Frame):
         self.OpenImage()
         self.btn_frame = Frame(self.parent)
         self.btn_frame.pack(fill=BOTH, expand=1)
+        self.btn_oper_frame = Frame(self.parent)
+        self.btn_oper_frame.pack(fill=BOTH, expand=1)
         self.button_close = Button(
             self.btn_frame, text="ZAVŘÍT", fg="red", command=self.btn_frame.quit
         )
@@ -30,8 +33,15 @@ class Editor(tk.Frame):
         self.button_load = Button(self.btn_frame, text="Otevřít", fg="blue", command=self.OpenImage)
         self.button_load.pack(side=RIGHT, padx=5, pady=5)
 
-        self.button_neg= Button(self.btn_frame, text="Negativ", fg="black", command=self.Negative)
-        self.button_neg.pack(side=RIGHT, padx=5, pady=5)
+        self.button_save = Button(self.btn_frame, text="Uložit", fg="green", command=self.SaveImage)
+        self.button_save.pack(side=RIGHT, padx=5, pady=5)
+
+        self.button_orig=Button(self.btn_frame, text="Původní obrázek", fg="purple", command=self.Original)
+        self.button_orig.pack(side=LEFT, padx=5, pady=5)
+
+        self.button_neg = Button(self.btn_oper_frame, text="Negativ", fg="black", command=self.Negative)
+        self.button_neg.pack(side=TOP, padx=5, pady=5)
+
     def OpenImage(self):
         filepath = askopenfilename(filetypes=([("Image files", "*.jpg;*.png;*.ppm")]))
         self.filename = filepath
@@ -41,7 +51,7 @@ class Editor(tk.Frame):
         self.data = np.asarray(self.img)
         self.modified = self.data
         width, height = self.img.size
-        size = str(width) + "x" + str(height+100) + "+500+100"
+        size = str(width) + "x" + str(height+150) + "+500+100"
         self.parent.geometry(size)
         photo = ImageTk.PhotoImage(self.img)
         self.img_frame.configure(image=photo)
@@ -53,6 +63,18 @@ class Editor(tk.Frame):
         photo = ImageTk.PhotoImage(im)
         self.img_frame.configure(image=photo)
         self.img_frame.image = photo
+
+    def Original(self):
+        self.modified = self.data
+        im = Image.fromarray(self.data.astype("uint8"))
+        photo = ImageTk.PhotoImage(im)
+        self.img_frame.configure(image=photo)
+        self.img_frame.image = photo
+
+    def SaveImage(self):
+        im = Image.fromarray(self.modified.astype("uint8"))
+        filepath = asksaveasfilename(filetypes=([("Image files", "*.jpg;*.png;*.ppm")]))
+        im.save(filepath + ".jpg")
 root = tk.Tk()
 Editor(root)
 
