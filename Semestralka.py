@@ -51,8 +51,20 @@ class Editor(tk.Frame):
         self.button_gray = Button(self.btn_oper_frame, text="Odstíny šedi", fg="black", command=self.GrayScale)
         self.button_gray.pack(side=RIGHT, padx=5, pady=5)
 
-        self.button_rot = Button(self.btn_oper_frame, text="Otočit", fg="black", command=self.Rotate)
-        self.button_rot.pack(side=RIGHT, padx=5, pady=5)
+        self.button_rotL = Button(self.btn_oper_frame, text="Otočit vlevo", fg="black", command=self.RotateL)
+        self.button_rotL.pack(side=RIGHT, padx=5, pady=5)
+
+        self.button_rotR = Button(self.btn_oper_frame, text="Otočit vpravo", fg="black", command=self.RotateR)
+        self.button_rotR.pack(side=RIGHT, padx=5, pady=5)
+
+        self.button_flipH = Button(self.btn_oper_frame, text="Flip horizontálně", fg="black", command=self.FlipH)
+        self.button_flipH.pack(side=RIGHT, padx=5, pady=5)
+
+        self.button_flipV = Button(self.btn_oper_frame, text="Flip vertikálně", fg="black", command=self.FlipV)
+        self.button_flipV.pack(side=RIGHT, padx=5, pady=5)
+
+        self.button_sharpen = Button(self.btn_oper_frame, text="Zostření", fg="black", command=self.Sharpen)
+        self.button_sharpen.pack(side=RIGHT, padx=5, pady=5)
 
     def OpenImage(self):
         filepath = askopenfilename(filetypes=([("Image files", "*.jpg;*.png;*.ppm")]))
@@ -63,7 +75,7 @@ class Editor(tk.Frame):
         self.data = np.asarray(self.img)
         self.modified = self.data
         width, height = self.img.size
-        size = str(width) + "x" + str(height+150) + "+500+100"
+        size = str(width+300) + "x" + str(height+150) + "+500+100"
         self.parent.geometry(size)
         photo = ImageTk.PhotoImage(self.img)
         self.img_frame.configure(image=photo)
@@ -71,6 +83,31 @@ class Editor(tk.Frame):
     def Negative(self):
 
         self.modified = 255-self.modified
+        self.Update()
+
+    def Sharpen(self):
+        filtr = np.array([[-1,-1,-1],[-1,9,-1],[-1,-1,-1]])
+        x,y,z = self.modified.shape
+        out = np.zeros([x-2,y-2,z])
+        for i in range(3):
+            data = self.modified[:,:,i]
+            w, h = data.shape
+            for y in range(1,h-2):
+                for x in range(1,w-2):
+                    vyrez = data[x-1:x+2,y-1:y+2]
+                    out[x,y,i] = (vyrez*filtr).sum()
+
+        #self.modified.shape = out.shape
+        self.modified = out
+        self.modified = np.clip(self.modified,0,255)
+        self.Update()
+
+    def FlipH(self):
+        self.modified = np.flip(self.modified, 0)
+        self.Update()
+
+    def FlipV(self):
+        self.modified = np.flip(self.modified, 1)
         self.Update()
 
     def Darken(self):
@@ -86,8 +123,12 @@ class Editor(tk.Frame):
         self.modified.shape = shape
         self.Update()
 
-    def Rotate(self):
+    def RotateL(self):
         self.modified = np.rot90(self.modified, 1)
+        self.Update()
+
+    def RotateR(self):
+        self.modified = np.rot90(self.modified, -1)
         self.Update()
 
     def GrayScale(self):
@@ -98,7 +139,7 @@ class Editor(tk.Frame):
     def Update(self):
         im = Image.fromarray(self.modified.astype("uint8"))
         photo = ImageTk.PhotoImage(im)
-        self.parent.geometry(str(self.modified.shape[1])+"x"+str(self.modified.shape[0]+150)+"+500+100")
+        self.parent.geometry(str(self.modified.shape[1]+300)+"x"+str(self.modified.shape[0]+150)+"+500+100")
         self.img_frame.configure(image=photo)
         self.img_frame.image = photo
 
