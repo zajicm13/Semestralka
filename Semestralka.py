@@ -51,6 +51,9 @@ class Editor(tk.Frame):
         self.button_gray = Button(self.btn_oper_frame, text="Odstíny šedi", fg="black", command=self.GrayScale)
         self.button_gray.pack(side=RIGHT, padx=5, pady=5)
 
+        self.button_rot = Button(self.btn_oper_frame, text="Otočit", fg="black", command=self.Rotate)
+        self.button_rot.pack(side=RIGHT, padx=5, pady=5)
+
     def OpenImage(self):
         filepath = askopenfilename(filetypes=([("Image files", "*.jpg;*.png;*.ppm")]))
         self.filename = filepath
@@ -83,6 +86,10 @@ class Editor(tk.Frame):
         self.modified.shape = shape
         self.Update()
 
+    def Rotate(self):
+        self.modified = np.rot90(self.modified, 1)
+        self.Update()
+
     def GrayScale(self):
         r, g, b = self.modified[:, :, 0], self.modified[:, :, 1], self.modified[:, :, 2]
         self.modified = 0.2989 * r + 0.5870 * g + 0.1140 * b
@@ -91,6 +98,7 @@ class Editor(tk.Frame):
     def Update(self):
         im = Image.fromarray(self.modified.astype("uint8"))
         photo = ImageTk.PhotoImage(im)
+        self.parent.geometry(str(self.modified.shape[1])+"x"+str(self.modified.shape[0]+150)+"+500+100")
         self.img_frame.configure(image=photo)
         self.img_frame.image = photo
 
