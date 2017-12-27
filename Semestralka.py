@@ -66,6 +66,9 @@ class Editor(tk.Frame):
         self.button_sharpen = Button(self.btn_oper_frame, text="Zostření", fg="black", command=self.Sharpen)
         self.button_sharpen.pack(side=RIGHT, padx=5, pady=5)
 
+        self.button_small = Button(self.btn_oper_frame, text="Zmenšit", fg="black", command=self.Small)
+        self.button_small.pack(side=RIGHT, padx=5, pady=5)
+
     def OpenImage(self):
         filepath = askopenfilename(filetypes=([("Image files", "*.jpg;*.png;*.ppm")]))
         self.filename = filepath
@@ -75,7 +78,7 @@ class Editor(tk.Frame):
         self.data = np.asarray(self.img)
         self.modified = self.data
         width, height = self.img.size
-        size = str(width+300) + "x" + str(height+150) + "+500+100"
+        size = str(width+450) + "x" + str(height+150) + "+500+100"
         self.parent.geometry(size)
         photo = ImageTk.PhotoImage(self.img)
         self.img_frame.configure(image=photo)
@@ -115,6 +118,15 @@ class Editor(tk.Frame):
         self.modified = np.ceil(self.modified)
         self.Update()
 
+    def Small(self):
+        self.modified = self.modified[::4]
+        self.RotateL()
+        self.modified = self.modified[::4]
+        self.RotateR()
+
+        print(self.modified.shape)
+        self.Update()
+
     def Brighten(self):
         shape = self.modified.shape
         self.modified = self.modified.flatten()
@@ -139,7 +151,7 @@ class Editor(tk.Frame):
     def Update(self):
         im = Image.fromarray(self.modified.astype("uint8"))
         photo = ImageTk.PhotoImage(im)
-        self.parent.geometry(str(self.modified.shape[1]+300)+"x"+str(self.modified.shape[0]+150)+"+500+100")
+        self.parent.geometry(str(self.modified.shape[1]+450)+"x"+str(self.modified.shape[0]+150)+"+500+100")
         self.img_frame.configure(image=photo)
         self.img_frame.image = photo
 
