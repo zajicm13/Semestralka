@@ -48,6 +48,9 @@ class Editor(tk.Frame):
         self.button_bright = Button(self.btn_oper_frame, text="Zesvětlit", fg="black", command=self.Brighten)
         self.button_bright.pack(side=RIGHT, padx=5, pady=5)
 
+        self.button_gray = Button(self.btn_oper_frame, text="Odstíny šedi", fg="black", command=self.GrayScale)
+        self.button_gray.pack(side=RIGHT, padx=5, pady=5)
+
     def OpenImage(self):
         filepath = askopenfilename(filetypes=([("Image files", "*.jpg;*.png;*.ppm")]))
         self.filename = filepath
@@ -68,16 +71,21 @@ class Editor(tk.Frame):
         self.Update()
 
     def Darken(self):
-        self.modified = self.modified*0.5
+        self.modified = self.modified*0.6
         self.modified = np.ceil(self.modified)
         self.Update()
 
     def Brighten(self):
         shape = self.modified.shape
         self.modified = self.modified.flatten()
-        self.modified = self.modified * 1.5
+        self.modified = self.modified * 1.6
         self.modified = np.clip(self.modified, 1, 255)
         self.modified.shape = shape
+        self.Update()
+
+    def GrayScale(self):
+        r, g, b = self.modified[:, :, 0], self.modified[:, :, 1], self.modified[:, :, 2]
+        self.modified = 0.2989 * r + 0.5870 * g + 0.1140 * b
         self.Update()
 
     def Update(self):
