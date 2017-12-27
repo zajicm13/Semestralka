@@ -78,7 +78,7 @@ class Editor(tk.Frame):
         self.data = np.asarray(self.img)
         self.modified = self.data
         width, height = self.img.size
-        size = str(width+450) + "x" + str(height+150) + "+500+100"
+        size = str(width+800) + "x" + str(height+150) + "+500+100"
         self.parent.geometry(size)
         photo = ImageTk.PhotoImage(self.img)
         self.img_frame.configure(image=photo)
@@ -127,6 +127,8 @@ class Editor(tk.Frame):
         print(self.modified.shape)
         self.Update()
 
+
+
     def Brighten(self):
         shape = self.modified.shape
         self.modified = self.modified.flatten()
@@ -151,7 +153,7 @@ class Editor(tk.Frame):
     def Update(self):
         im = Image.fromarray(self.modified.astype("uint8"))
         photo = ImageTk.PhotoImage(im)
-        self.parent.geometry(str(self.modified.shape[1]+450)+"x"+str(self.modified.shape[0]+150)+"+500+100")
+        self.parent.geometry(str(self.modified.shape[1]+800)+"x"+str(self.modified.shape[0]+150)+"+500+100")
         self.img_frame.configure(image=photo)
         self.img_frame.image = photo
 
