@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import *
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
-from tkinter.messagebox import showerror
 from PIL import ImageTk
 from PIL import Image
 import numpy as np
@@ -27,7 +26,7 @@ class Editor(tk.Frame):
         self.btn_oper_frame = Frame(self.parent)
         self.btn_oper_frame.pack(fill=BOTH, expand=1)
         self.button_close = Button(
-            self.btn_frame, text="ZAVŘÍT", fg="red", command=self.btn_frame.quit
+            self.btn_frame, text="Zavřít", fg="red", command=self.btn_frame.quit
         )
         self.button_close.pack(side=LEFT, padx=5, pady=5)
         self.button_load = Button(self.btn_frame, text="Otevřít", fg="blue", command=self.OpenImage)
@@ -100,7 +99,6 @@ class Editor(tk.Frame):
                     vyrez = data[x-1:x+2,y-1:y+2]
                     out[x,y,i] = (vyrez*filtr).sum()
 
-        #self.modified.shape = out.shape
         self.modified = out
         self.modified = np.clip(self.modified,0,255)
         self.Update()
@@ -120,12 +118,9 @@ class Editor(tk.Frame):
 
     def Small(self):
         self.modified = self.modified[::4]
-        self.RotateL()
+        self.modified = np.rot90(self.modified, 1)
         self.modified = self.modified[::4]
         self.RotateR()
-
-        print(self.modified.shape)
-        self.Update()
 
 
 
@@ -138,7 +133,7 @@ class Editor(tk.Frame):
         self.Update()
 
     def RotateL(self):
-        self.modified = np.rot90(self.modified, 1)
+
         self.Update()
 
     def RotateR(self):
@@ -159,10 +154,7 @@ class Editor(tk.Frame):
 
     def Original(self):
         self.modified = self.data
-        im = Image.fromarray(self.data.astype("uint8"))
-        photo = ImageTk.PhotoImage(im)
-        self.img_frame.configure(image=photo)
-        self.img_frame.image = photo
+        self.Update()
 
     def SaveImage(self):
         im = Image.fromarray(self.modified.astype("uint8"))
